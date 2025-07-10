@@ -1,15 +1,13 @@
-# iced_drop
+# iced_drop 0.1.0
 
-A small library which provides a custom widget and operation to make drag and drop easier to implement in [iced](https://github.com/iced-rs/iced/tree/master)
+**Small library providing a custom widget and operation to implement drag and drop in [iced](https://github.com/iced-rs/iced/tree/master)**
 
 ## Usage
-
-To add drag and drog functionality, first define two messages with the following format
-
+To add drag and drog functionality, first define two messages with the following format:
 ```rust
 enum Message {
-    Drop(iced::Point, iced::Rectangle)
-    HandleZones(Vec<(iced::advanced::widget::Id, iced::Rectangle)>)
+	Drop(iced::Point, iced::Rectangle)
+	HandleZones(Vec<(iced::advanced::widget::Id, iced::Rectangle)>)
 }
 ```
 
@@ -27,31 +25,30 @@ Next, create a "drop zone." A drop zone is any widget that operates like a conta
 
 ```rust
 iced::widget::container("Drop zone")
-    .id(iced::widget::container::Id::new("drop_zone"));
+	.id(iced::widget::container::Id::new("drop_zone"));
 ```
 
 Finally, handle the updates of the drop messages
 
 ```rust
 match message {
-    Message::Drop(cursor_pos, _) => {
-        return iced_drop::zones_on_point(
-            Message::HandleZonesFound,
-            point,
-            None,
-            None,
-        );
-    }
-    Message::HandleZones(zones) => {
-        println!("{:?}", zones)
-    }
+	Message::Drop(cursor_pos, _) => {
+		return iced_drop::zones_on_point(
+			Message::HandleZonesFound,
+			point,
+			None,
+			None,
+		);
+	}
+	Message::HandleZones(zones) => {
+		println!("{:?}", zones)
+	}
 }
 ```
 
 On Drop, we return a widget operation that looks for drop zones under the cursor_pos. When this operation finishes, it returns the zones found and sends the `HandleZones` message. In this example, we only defined one zone, so the zones vector will either be empty if the droppable was not dropped on the zone, or it will contain the `drop_zone`
 
 ## Examples
-
 There are two examples: color, todo.
 
 The color example is a very basic drag/drop showcase where the user can drag colors into zones and change the zone's color. I would start here.
@@ -69,5 +66,4 @@ To run this example try: `cargo run -p todo`
 Note: the todo example might also be a good example on how one can use operations. Check examples/todo/src/operation.rs. I didn't find any other examples of this in the iced repo except for the built in focus operations.
 
 ## Future Development
-
 Right now it's a little annoying having to work with iced's Id type. At some point, I will work on a drop_zone widget that can take some generic clonable type as an id, and I will create a seperate find_zones operation that will return a list of this custom Id. This should make it easier to determine which drop zones were found.
