@@ -48,22 +48,5 @@ match message {
 
 On Drop, we return a widget operation that looks for drop zones under the cursor_pos. When this operation finishes, it returns the zones found and sends the `HandleZones` message. In this example, we only defined one zone, so the zones vector will either be empty if the droppable was not dropped on the zone, or it will contain the `drop_zone`
 
-## Examples
-There are two examples: color, todo.
-
-The color example is a very basic drag/drop showcase where the user can drag colors into zones and change the zone's color. I would start here.
-
-[Link to video](https://drive.google.com/file/d/1K1CCi2Lc90IUyDufsvoUBZmUCbeg6_Fi/view?usp=sharing)
-
-To run this examples: `cargo run -p color`
-
-The todo example is a basic todo board application similar to Trello. This is a much much more complex example as it handles custom highlighting and nested droppables, but it just shows you can make some pretty cool things with iced.
-
-[Link to video](https://drive.google.com/file/d/1MLOCk4Imd_oUnrTj_psbpYbwua976HmR/view?usp=sharing)
-
-To run this example try: `cargo run -p todo`
-
-Note: the todo example might also be a good example on how one can use operations. Check examples/todo/src/operation.rs. I didn't find any other examples of this in the iced repo except for the built in focus operations.
-
 ## Future Development
 Right now it's a little annoying having to work with iced's Id type. At some point, I will work on a drop_zone widget that can take some generic clonable type as an id, and I will create a seperate find_zones operation that will return a list of this custom Id. This should make it easier to determine which drop zones were found.

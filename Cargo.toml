@@ -8,6 +8,3 @@ description = "Small library providing a custom widget and operation to implemen
 [dependencies.iced]
 version = "0.13"
 features = ["advanced"]
-
-[workspace]
-members = ["examples/*"]
