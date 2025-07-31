@@ -1,4 +1,11 @@
-# iced_drop 0.1.0
+[![version](https://img.shields.io/crates/v/iced_drop.svg)](https://crates.io/crates/iced_drop)
+[![build](https://github.com/pepa65/iced_drop/actions/workflows/ci.yml/badge.svg)](https://github.com/pepa65/iced_drop/actions/workflows/ci.yml)
+[![dependencies](https://deps.rs/repo/github/pepa65/iced_drop/status.svg)](https://deps.rs/repo/github/pepa65/iced_drop)
+[![docs](https://img.shields.io/badge/docs-iced__drop-blue.svg)](https://docs.rs/crate/iced_drop/latest)
+[![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/pepa65/iced_drop/blob/main/LICENSE)
+[![downloads](https://img.shields.io/crates/d/iced_drop.svg)](https://crates.io/crates/iced_drop)
+
+# iced_drop 0.1.12
 
 **Small library providing a custom widget and operation to implement drag and drop in [iced](https://github.com/iced-rs/iced/tree/master)**
 
