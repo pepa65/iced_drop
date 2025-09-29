@@ -1,11 +1,13 @@
 [package]
 name = "iced_drop"
-version = "0.1.39"
+version = "0.1.40"
 edition = "2024"
 authors = ["github.com/jhannyk", "github.com/pepa65"]
 description = "Small library providing a custom widget and operation to implement drag and drop in iced"
 repository = "https://github.com/pepa65/iced_drop"
 readme = "README.md"
+keywords = ["iced", "widget"]
+categories = ["game-development", "gui"]
 license = "MIT"
 
 [dependencies]
