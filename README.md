@@ -5,7 +5,7 @@
 [![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/pepa65/iced_drop/blob/main/LICENSE)
 [![downloads](https://img.shields.io/crates/d/iced_drop.svg)](https://crates.io/crates/iced_drop)
 
-# iced_drop 0.1.62
+# iced_drop 0.1.63
 
 **Small library providing a custom widget and operation to implement drag and drop in [iced](https://github.com/iced-rs/iced/tree/master)**
 
