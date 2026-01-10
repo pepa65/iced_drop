@@ -2,6 +2,15 @@
 
 A small library which provides a custom widget and operation to make drag and drop easier to implement in [iced](https://github.com/iced-rs/iced/tree/master)
 
+## Versioning
+
+| `iced` version | `iced_drop` version |
+| -------------- | -----------------   |
+| 0.13.1         | 0.1        	       |
+| 0.14           | 0.2                 |
+
+Version 0.2 is adapted by https://github.com/pml68 (see https://github.com/pml68/iced_drop)
+
 ## Usage
 
 To add drag and drog functionality, first define two messages with the following format
