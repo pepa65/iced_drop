@@ -4,7 +4,6 @@ use std::vec;
 
 use iced::advanced::widget::{Operation, Tree, Widget};
 use iced::advanced::{self, Layout, layout, mouse, overlay, renderer};
-use iced::event::Status;
 use iced::{Element, Point, Rectangle, Size, Vector};
 
 /// An element that can be dragged and dropped on a [`DropZone`]
@@ -158,27 +157,28 @@ where
 		self.content.as_widget().size()
 	}
 
-	fn on_event(
-		&mut self, tree: &mut iced::advanced::widget::Tree, event: iced::Event, layout: iced::advanced::Layout<'_>, cursor: iced::advanced::mouse::Cursor,
+	fn update(
+		&mut self, tree: &mut iced::advanced::widget::Tree, event: &iced::Event, layout: iced::advanced::Layout<'_>, cursor: iced::advanced::mouse::Cursor,
 		_renderer: &Renderer, _clipboard: &mut dyn iced::advanced::Clipboard, shell: &mut iced::advanced::Shell<'_, Message>, _viewport: &iced::Rectangle,
-	) -> iced::advanced::graphics::core::event::Status {
+	) {
 		// handle the on event of the content first, in case that the droppable is nested
-		let status = self
-			.content
-			.as_widget_mut()
-			.on_event(&mut tree.children[0], event.clone(), layout, cursor, _renderer, _clipboard, shell, _viewport);
+		// let status =
+		//self
+		//	.content
+		//	.as_widget_mut()
+		//	.update(&mut tree.children[0], event, layout, cursor, _renderer, _clipboard, shell, _viewport);
 		// this should really only be captured if the droppable is nested or it contains some other
 		// widget that captures the event
-		if status == Status::Captured {
-			return status;
-		};
+		//if status == Status::Captured {
+		//	return status;
+		//};
 
 		if let Some(on_drop) = self.on_drop.as_deref() {
 			let state = tree.state.downcast_mut::<State>();
 			if let iced::Event::Mouse(mouse) = event {
 				match mouse {
 					mouse::Event::ButtonPressed(btn) => {
-						if btn == mouse::Button::Left && cursor.is_over(layout.bounds()) {
+						if *btn == mouse::Button::Left && cursor.is_over(layout.bounds()) {
 							// select the droppable and store the position of the widget before dragging
 							state.action = Action::Select(cursor.position().unwrap());
 							let bounds = layout.bounds();
@@ -189,8 +189,7 @@ where
 							if let Some(on_click) = self.on_click.clone() {
 								shell.publish(on_click);
 							}
-							return Status::Captured;
-						} else if btn == mouse::Button::Right {
+						} else if *btn == mouse::Button::Right {
 							if let Action::Drag(_, _) = state.action {
 								shell.invalidate_layout();
 								state.action = Action::None;
@@ -200,7 +199,7 @@ where
 							}
 						}
 					}
-					mouse::Event::CursorMoved { mut position } => match state.action {
+					&mouse::Event::CursorMoved { mut position } => match state.action {
 						Action::Select(start) | Action::Drag(start, _) => {
 							// calculate the new position of the widget after dragging
 
@@ -226,7 +225,7 @@ where
 						_ => (),
 					},
 					mouse::Event::ButtonReleased(btn) => {
-						if btn == mouse::Button::Left {
+						if *btn == mouse::Button::Left {
 							match state.action {
 								Action::Select(_) => {
 									state.action = Action::None;
@@ -250,12 +249,12 @@ where
 				}
 			}
 		}
-		Status::Ignored
+
 	}
 
-	fn layout(&self, tree: &mut iced::advanced::widget::Tree, renderer: &Renderer, limits: &iced::advanced::layout::Limits) -> iced::advanced::layout::Node {
+	fn layout(&mut self, tree: &mut iced::advanced::widget::Tree, renderer: &Renderer, limits: &iced::advanced::layout::Limits) -> iced::advanced::layout::Node {
 		let state: &mut State = tree.state.downcast_mut::<State>();
-		let content_node = self.content.as_widget().layout(&mut tree.children[0], renderer, limits);
+		let content_node = self.content.as_widget_mut().layout(&mut tree.children[0], renderer, limits);
 
 		// Adjust the size of the original widget if it's being dragged or we're wating to reset the size
 		if let Some(new_size) = self.drag_size {
@@ -279,12 +278,13 @@ where
 		content_node
 	}
 
-	fn operate(&self, tree: &mut Tree, layout: Layout<'_>, renderer: &Renderer, operation: &mut dyn Operation) {
+	fn operate(&mut self, tree: &mut Tree, layout: Layout<'_>, _renderer: &Renderer, operation: &mut dyn Operation) {
 		let state = tree.state.downcast_mut::<State>();
-		operation.custom(state, self.id.as_ref());
-		operation.container(self.id.as_ref(), layout.bounds(), &mut |operation| {
-			self.content.as_widget().operate(&mut tree.children[0], layout, renderer, operation);
-		});
+		operation.custom(self.id.as_ref(), layout.bounds(), state);
+		operation.container(self.id.as_ref(), layout.bounds());
+		operation.traverse(&mut |operation| {
+			self.content.as_widget_mut().operate(&mut tree.children[0], layout, _renderer, operation);
+		});		
 	}
 
 	fn draw(
@@ -302,20 +302,20 @@ where
 	}
 
 	fn overlay<'b>(
-		&'b mut self, tree: &'b mut Tree, layout: Layout<'_>, renderer: &Renderer, _translation: Vector,
+		&'b mut self, tree: &'b mut Tree, layout: Layout<'b>, renderer: &Renderer, _viewport: &Rectangle, _translation: Vector,
 	) -> Option<overlay::Element<'b, Message, Theme, Renderer>> {
 		let state: &mut State = tree.state.downcast_mut::<State>();
 		let mut children = tree.children.iter_mut();
 		if self.drag_overlay {
 			if let Action::Drag(_, _) = state.action {
 				return Some(overlay::Element::new(Box::new(Overlay {
-					content: &self.content,
+					content: &mut self.content,
 					tree: children.next().unwrap(),
 					overlay_bounds: state.overlay_bounds,
 				})));
 			}
 		}
-		self.content.as_widget_mut().overlay(children.next().unwrap(), layout, renderer, _translation)
+		self.content.as_widget_mut().overlay(children.next().unwrap(), layout, renderer, _viewport, _translation)
 	}
 
 	fn mouse_interaction(
@@ -376,7 +376,7 @@ struct Overlay<'a, 'b, Message, Theme, Renderer>
 where
 	Renderer: renderer::Renderer,
 {
-	content: &'b Element<'a, Message, Theme, Renderer>,
+	content: &'b mut Element<'a, Message, Theme, Renderer>,
 	tree: &'b mut advanced::widget::Tree,
 	overlay_bounds: Rectangle,
 }
@@ -386,7 +386,7 @@ where
 	Renderer: renderer::Renderer,
 {
 	fn layout(&mut self, renderer: &Renderer, _bounds: Size) -> layout::Node {
-		Widget::<Message, Theme, Renderer>::layout(self.content.as_widget(), self.tree, renderer, &layout::Limits::new(Size::ZERO, self.overlay_bounds.size()))
+		Widget::<Message, Theme, Renderer>::layout(self.content.as_widget_mut(), self.tree, renderer, &layout::Limits::new(Size::ZERO, self.overlay_bounds.size()))
 			.move_to(self.overlay_bounds.position())
 	}
 
@@ -399,11 +399,8 @@ where
 			inherited_style,
 			layout,
 			cursor_position,
-			&Rectangle::with_size(Size::INFINITY),
+			&Rectangle::with_size(Size::INFINITE),
 		);
 	}
 
-	fn is_over(&self, _layout: Layout<'_>, _renderer: &Renderer, _cursor_position: Point) -> bool {
-		false
-	}
 }
