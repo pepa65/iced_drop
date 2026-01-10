@@ -28,7 +28,19 @@ where
 	where
 		F: Fn(&Rectangle) -> bool + Send + 'static,
 	{
-		fn container(&mut self, id: Option<&Id>, bounds: iced::Rectangle, operate_on_children: &mut dyn FnMut(&mut dyn Operation<Vec<(Id, Rectangle)>>)) {
+
+		fn traverse(&mut self, operate: &mut dyn FnMut(&mut dyn Operation<Vec<(Id, Rectangle)>>)) {
+			let goto_next = match &self.max_depth {
+				Some(m_depth) => self.c_depth < *m_depth,
+				None => true,
+			};
+
+			if goto_next {
+				operate(self);
+			}
+		}
+
+	    fn container(&mut self, id: Option<&Id>, bounds: Rectangle) {
 			if let Some(id) = id {
 				let is_option = match &self.options {
 					Some(options) => options.contains(id),
@@ -40,20 +52,13 @@ where
 					self.zones.push((id.clone(), bounds));
 				}
 			}
-			let goto_next = match &self.max_depth {
-				Some(m_depth) => self.c_depth < *m_depth,
-				None => true,
-			};
-			if goto_next {
-				operate_on_children(self);
-			}
 		}
 
 		fn finish(&self) -> Outcome<Vec<(Id, Rectangle)>> {
 			Outcome::Some(self.zones.clone())
 		}
 
-		fn scrollable(&mut self, _state: &mut dyn Scrollable, _id: Option<&Id>, bounds: Rectangle, _content_bounds: Rectangle, translation: Vector) {
+		fn scrollable(&mut self, _id: Option<&Id>, bounds: Rectangle, _content_bounds: Rectangle, translation: Vector, _state: &mut dyn Scrollable) {
 			if (self.filter)(&bounds) {
 				self.offset = self.offset + translation;
 			}

@@ -9,6 +9,13 @@
 
 **Small library providing a custom widget and operation to implement drag and drop in [iced](https://github.com/iced-rs/iced/tree/master)**
 
+## Versioning
+
+| `iced` version | `iced_drop` version |
+| -------------- | ----------------- |
+| 0.13.1         | 0.1        	     |
+| 0.14           | 0.2               |
+
 ## Usage
 To add drag and drog functionality, first define two messages with the following format:
 ```rust
