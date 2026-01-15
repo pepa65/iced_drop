@@ -22,13 +22,14 @@ where
 		max_depth: Option<usize>,
 		c_depth: usize,
 		offset: Vector,
+		goto_next: bool,
 	}
 
 	impl<F> Operation<Vec<(Id, Rectangle)>> for FindDropZone<F>
 	where
 		F: Fn(&Rectangle) -> bool + Send + 'static,
 	{
-		fn container(&mut self, id: Option<&Id>, bounds: iced::Rectangle, operate_on_children: &mut dyn FnMut(&mut dyn Operation<Vec<(Id, Rectangle)>>)) {
+		fn container(&mut self, id: Option<&Id>, bounds: iced::Rectangle) {
 			if let Some(id) = id {
 				let is_option = match &self.options {
 					Some(options) => options.contains(id),
@@ -40,12 +41,15 @@ where
 					self.zones.push((id.clone(), bounds));
 				}
 			}
-			let goto_next = match &self.max_depth {
+			self.goto_next = match &self.max_depth {
 				Some(m_depth) => self.c_depth < *m_depth,
 				None => true,
 			};
-			if goto_next {
-				operate_on_children(self);
+		}
+
+		fn traverse(&mut self, operate: &mut dyn FnMut(&mut dyn Operation<Vec<(Id, Rectangle)>>)) {
+			if self.goto_next {
+				operate(self);
 			}
 		}
 
@@ -53,12 +57,12 @@ where
 			Outcome::Some(self.zones.clone())
 		}
 
-		fn scrollable(&mut self, _state: &mut dyn Scrollable, _id: Option<&Id>, bounds: Rectangle, _content_bounds: Rectangle, translation: Vector) {
+		fn scrollable(&mut self, _id: Option<&Id>, bounds: Rectangle, _content_bounds: Rectangle, translation: Vector, _state: &mut dyn Scrollable) {
 			if (self.filter)(&bounds) {
-				self.offset = self.offset + translation;
+				self.offset += translation;
 			}
 		}
 	}
 
-	FindDropZone { filter, options, zones: vec![], max_depth: depth, c_depth: 0, offset: Vector { x: 0.0, y: 0.0 } }
+	FindDropZone { filter, options, zones: vec![], max_depth: depth, c_depth: 0, offset: Vector { x: 0.0, y: 0.0 }, goto_next: false }
 }
