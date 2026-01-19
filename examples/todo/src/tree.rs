@@ -296,7 +296,7 @@ impl List {
             });
         droppable(content)
             .id(self.id.clone())
-            .on_press(Message::StopEditingTodo)
+            .on_click(Message::StopEditingTodo)
             .on_drop(move |p, r| Message::DropList(location, p, r))
             .on_drag(move |p, r| Message::DragList(location, p, r))
             .on_cancel(Message::ListDropCanceled)

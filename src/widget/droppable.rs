@@ -25,6 +25,7 @@ pub struct Droppable<
     id: Option<Id>,
     drag_threshold: f32,
     on_press: Option<Message>,
+    on_click: Option<Message>,
     on_drop: Option<Box<dyn Fn(Point, Rectangle) -> Message + 'a>>,
     on_drag: Option<Box<dyn Fn(Point, Rectangle) -> Message + 'a>>,
     on_cancel: Option<Message>,
@@ -51,6 +52,7 @@ where
             id: None,
             drag_threshold: 5.0,
             on_press: None,
+            on_click: None,
             on_drop: None,
             on_drag: None,
             on_cancel: None,
@@ -81,7 +83,17 @@ where
         self
     }
 
-    /// Sets the message that will be produced when the [`Droppable`] is pressed, but not dragged.
+    /// Sets the message that will be produced when the [`Droppable`] is clicked.
+    ///
+    /// This will get triggered even if drag occurs.
+    pub fn on_click(mut self, message: Message) -> Self {
+        self.on_click = Some(message);
+        self
+    }
+
+    /// Sets the message that will be produced when the [`Droppable`] is pressed.
+    ///
+    /// This will get triggered only when not dragging.
     pub fn on_press(mut self, message: Message) -> Self {
         self.on_press = Some(message);
         self
@@ -320,6 +332,10 @@ where
                         state.widget_pos = bounds.position();
                         state.overlay_bounds.width = bounds.width;
                         state.overlay_bounds.height = bounds.height;
+
+                        if let Some(on_click) = self.on_click.clone() {
+                            shell.publish(on_click);
+                        }
 
                         shell.capture_event();
                     } else if *btn == mouse::Button::Right
