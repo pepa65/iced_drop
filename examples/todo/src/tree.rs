@@ -296,7 +296,7 @@ impl List {
             });
         droppable(content)
             .id(self.id.clone())
-            .on_click(Message::StopEditingTodo)
+            .on_press(Message::StopEditingTodo)
             .on_drop(move |p, r| Message::DropList(location, p, r))
             .on_drag(move |p, r| Message::DragList(location, p, r))
             .on_cancel(Message::ListDropCanceled)
@@ -379,7 +379,7 @@ impl Todo {
         if !self.editing {
             droppable(content)
                 .id(self.id.clone())
-                .on_click(Message::EditTodo(location, self.t_id.clone()))
+                .on_press(Message::EditTodo(location, self.t_id.clone()))
                 .on_drop(move |p, r| Message::DropTodo(location, p, r))
                 .on_drag(move |_p, r| Message::DragTodo(location, r))
                 .on_cancel(Message::TodoDropCanceled)
