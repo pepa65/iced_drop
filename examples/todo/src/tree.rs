@@ -379,7 +379,7 @@ impl Todo {
         if !self.editing {
             droppable(content)
                 .id(self.id.clone())
-                .on_click(Message::EditTodo(location, self.t_id.clone()))
+                .on_press(Message::EditTodo(location, self.t_id.clone()))
                 .on_drop(move |p, r| Message::DropTodo(location, p, r))
                 .on_drag(move |_p, r| Message::DragTodo(location, r))
                 .on_cancel(Message::TodoDropCanceled)

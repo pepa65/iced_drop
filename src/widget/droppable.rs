@@ -1,12 +1,15 @@
 //! Encapsulates a widget that can be dragged and dropped.
 use iced_core::layout::{Limits, Node};
-use iced_core::widget::{Id, Operation, Tree};
-use iced_core::{mouse, overlay, renderer, window, Element, Event, Layout, Length, Pixels, Point, Rectangle, Size, Vector, Widget};
-use std::fmt::Debug;
-use std::vec;
 use iced_core::mouse::Cursor;
 use iced_core::renderer::Style;
 use iced_core::widget::tree::Tag;
+use iced_core::widget::{Id, Operation, Tree};
+use iced_core::{
+    Element, Event, Layout, Length, Pixels, Point, Rectangle, Size, Vector,
+    Widget, mouse, overlay, renderer, window,
+};
+use std::fmt::Debug;
+use std::vec;
 
 /// An element that can be dragged and dropped on a [`DropZone`]
 pub struct Droppable<
@@ -23,7 +26,6 @@ pub struct Droppable<
     drag_threshold: f32,
     on_press: Option<Message>,
     on_click: Option<Message>,
-    on_single_click: Option<Message>,
     on_drop: Option<Box<dyn Fn(Point, Rectangle) -> Message + 'a>>,
     on_drag: Option<Box<dyn Fn(Point, Rectangle) -> Message + 'a>>,
     on_cancel: Option<Message>,
@@ -51,7 +53,6 @@ where
             drag_threshold: 5.0,
             on_press: None,
             on_click: None,
-            on_single_click: None,
             on_drop: None,
             on_drag: None,
             on_cancel: None,
@@ -82,21 +83,19 @@ where
         self
     }
 
-    /// Sets the message that will be produced when the [`Droppable`] is pressed, but not dragged.
-    pub fn on_press(mut self, message: Message) -> Self {
-        self.on_press = Some(message);
-        self
-    }
-
     /// Sets the message that will be produced when the [`Droppable`] is clicked.
+    ///
+    /// This will get triggered even if drag occurs.
     pub fn on_click(mut self, message: Message) -> Self {
         self.on_click = Some(message);
         self
     }
 
-    /// Sets the message that will be produced when the [`Droppable`] is clicked, but not dragged.
-    pub fn on_single_click(mut self, message: Message) -> Self {
-        self.on_single_click = Some(message);
+    /// Sets the message that will be produced when the [`Droppable`] is pressed.
+    ///
+    /// This will get triggered only when not dragging.
+    pub fn on_press(mut self, message: Message) -> Self {
+        self.on_press = Some(message);
         self
     }
 
@@ -337,6 +336,7 @@ where
                         if let Some(on_click) = self.on_click.clone() {
                             shell.publish(on_click);
                         }
+
                         shell.capture_event();
                     } else if *btn == mouse::Button::Right
                         && let Action::Drag(_, _) = state.action
@@ -410,20 +410,23 @@ where
                     if *btn == mouse::Button::Left {
                         match state.action {
                             Action::Select(_) => {
-                                if let Some(on_single_click) = self.on_single_click.clone() {
-                                    shell.publish(on_single_click);
+                                if let Some(on_press) = self.on_press.clone() {
+                                    shell.publish(on_press);
                                 }
+
                                 state.action = Action::None;
                             }
                             Action::Drag(_, current) => {
                                 // send on drop msg
-                                let message = (on_drop)(current, state.overlay_bounds);
+                                let message =
+                                    (on_drop)(current, state.overlay_bounds);
                                 shell.publish(message);
 
                                 if self.reset_delay == 0 {
                                     state.action = Action::None;
                                 } else {
-                                    state.action = Action::Wait(self.reset_delay);
+                                    state.action =
+                                        Action::Wait(self.reset_delay);
                                 }
                             }
                             _ => (),
@@ -446,9 +449,7 @@ where
             Status::Active
         };
 
-        if let Event::Window(window::Event::RedrawRequested(_now)) =
-            event
-        {
+        if let Event::Window(window::Event::RedrawRequested(_now)) = event {
             self.status = Some(current_status);
         } else if self.status.is_some_and(|status| status != current_status) {
             shell.request_redraw();
