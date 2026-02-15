@@ -1,14 +1,15 @@
 [package]
 name = "iced_drop"
-version = "0.2.2"
+version = "0.2.9"
 edition = "2024"
 rust-version = "1.88"
 
 [dependencies]
+iced = { version = "0.14", features = ["wgpu"] }
 iced_core = "0.14"
 iced_widget = "0.14"
 iced_runtime = { version = "0.14", optional = true }
-
+#iced_renderer = { version = "0.14", features = ["wgpu"] }
 [workspace]
 members = ["examples/*"]
 
