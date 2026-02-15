@@ -2,16 +2,22 @@
 name = "iced_drop"
 version = "0.2.9"
 edition = "2024"
-rust-version = "1.88"
+authors = ["github.com/jhannyk", "github.com/pepa65"]
+description = "Small library providing a custom widget and operation to implement drag and drop in iced"
+readme = "README.md"
+keywords = ["iced", "widget"]
+categories = ["game-development", "gui"]
+license = "MIT"
 
 [dependencies]
-iced = { version = "0.14", features = ["wgpu"] }
+iced = { version = "0.14", features = ["advanced", "x11", "wgpu", "tiny-skia"] }
 iced_core = "0.14"
 iced_widget = "0.14"
 iced_runtime = { version = "0.14", optional = true }
-#iced_renderer = { version = "0.14", features = ["wgpu"] }
+
 [workspace]
 members = ["examples/*"]
 
 [features]
 helpers = ["iced_runtime"]
+

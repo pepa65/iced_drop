@@ -385,7 +385,7 @@ where
                     position,
                     ..
                 }) => {
-                    let mut position = position.clone();
+                    let mut position = *position;
 
                     let should_drag = match state.action {
                         Action::Select(start) => {
