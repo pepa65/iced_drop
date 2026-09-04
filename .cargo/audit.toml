@@ -1,0 +1,6 @@
+[advisories]
+ignore = [
+	"RUSTSEC-2024-0436", # paste: unmaintained; transitive dependency, no replacement available
+	"RUSTSEC-2026-0192", # ttf-parser: unmaintained; transitive dependency, no replacement available
+	"RUSTSEC-2026-0253", # lru: unsound; transitive via cryoglyph, no fixed upstream available
+]
