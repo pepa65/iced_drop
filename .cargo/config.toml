@@ -1,0 +1,10 @@
+[alias]
+rel = "build --release --target x86_64-unknown-linux-musl"
+inst = "install --target x86_64-unknown-linux-musl --path ."
+clip = "clippy --release --all-targets --all-features -- -D warnings"
+pub = "publish --target x86_64-unknown-linux-musl"
+up = "update --verbose"
+au = "audit --deny warnings"
+
+[target.x86_64-unknown-linux-musl]
+rustflags = [ "-Ctarget-feature=+crt-static", "-Ctarget-cpu=generic"]
