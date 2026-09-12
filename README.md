@@ -1,4 +1,4 @@
-# iced_drop
+# iced_drop 0.2.46
 
 A small library which provides a custom widget and operation to make drag and drop easier to implement in [iced](https://github.com/iced-rs/iced/tree/master)
 
