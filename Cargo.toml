@@ -1,6 +1,6 @@
 [package]
 name = "iced_drop"
-version = "0.2.48"
+version = "0.2.49"
 edition = "2024"
 rust-version = "1.90.0"
 authors = ["github.com/jhannyk", "github.com/pepa65"]
