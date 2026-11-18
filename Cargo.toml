@@ -11,10 +11,8 @@ categories = ["game-development", "gui"]
 license = "MIT"
 
 [dependencies]
-#iced = { version = "0.14", features = ["advanced", "x11", "wgpu", "tiny-skia"] }
-iced = { version = "0.14", features = ["advanced", "x11", "tiny-skia"] }
 iced_core = "0.14"
-iced_widget = "0.14"
+iced_widget = { version = "0.14", features = ["wgpu"] }
 iced_runtime = { version = "0.14", optional = true }
 
 [workspace]
